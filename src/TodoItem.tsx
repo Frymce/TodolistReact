@@ -1,4 +1,4 @@
-import { Trash } from "lucide-react";
+import { Edit, Trash } from "lucide-react";
 
 type Priority = 'Urgente' | 'Moyenne' | 'Basse';
 
@@ -13,9 +13,9 @@ type TodoItemProps = {
     onDelete: () => void
     isSelected: boolean
     onToggleSelect: (id: number) => void
-    //   onEdit: (id: number, newText: string) => void;
+    onEdit: (id: number, newText: string) => void;
 };
-const TodoItem = ({ todo, onDelete, isSelected, onToggleSelect }: TodoItemProps) => {
+const TodoItem = ({ todo, onDelete, isSelected, onToggleSelect, onEdit }: TodoItemProps) => {
     return (
         <li className="p-3">
             <div className="flex justify-between items-center">
@@ -34,11 +34,19 @@ const TodoItem = ({ todo, onDelete, isSelected, onToggleSelect }: TodoItemProps)
                         {todo.priority}
                     </span>
                 </div>
-                <button
-                    onClick={onDelete}
-                    className="btn btn-sm btn-error btn-soft">
-                    <Trash className="w-4 h-4" />
-                </button>
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={() => onEdit(todo.id, prompt("Modifier la tâche", todo.text) || todo.text)}
+                        className="btn btn-sm btn-primary btn-soft">
+                        <Edit className="w-4 h-4" />
+                    </button>
+                    <button
+                        onClick={onDelete}
+                        className="btn btn-sm btn-error btn-soft">
+                        <Trash className="w-4 h-4" />
+                    </button>
+
+                </div>
             </div>
         </li>
 

@@ -64,6 +64,16 @@ function App() {
     setTodos(newTodos);
   }
 
+  function editTodo(id: number, newText: string) {
+    const newTodos = todos.map((todo) => {
+      if (todo.id === id) {
+        return { ...todo, text: newText };
+      }
+      return todo;
+    });
+    setTodos(newTodos);
+  }
+
   const [selectedTodos, setSelectedTodos] = useState<Set<number>>(new Set());
 
   function toggleSelectedTodo(id: number) {
@@ -119,7 +129,7 @@ function App() {
           </select>
           <button
             onClick={addTodo} className="btn btn-primary">
-            Ajouter
+            {"Ajouter"}
           </button>
         </div>
         <div className=' space-y-2 flex-1 h-fit'>
@@ -165,6 +175,7 @@ function App() {
                     isSelected={selectedTodos.has(todo.id)}
                     todo={todo}
                     onDelete={() => deleteTodo(todo.id)}
+                    onEdit={editTodo}
                     onToggleSelect={() => toggleSelectedTodo(todo.id)}
                   />
                 </li>
