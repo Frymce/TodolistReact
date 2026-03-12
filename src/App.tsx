@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import TodoItem from './TodoItem';
-import { Construction } from 'lucide-react';
+import { Construction, Trash } from 'lucide-react';
 
 type Priority = 'Urgente' | 'Moyenne' | 'Basse';
 
@@ -9,6 +9,7 @@ type Todo = {
   id: number;
   text: string;
   priority: Priority;
+  completedAt?: string;
 }
 
 function App() {
@@ -75,15 +76,25 @@ function App() {
     setSelectedTodos(newSelectedTodos);
   }
 
+  const [completedTodos, setCompletedTodos] = useState<Todo[]>([]);
+
   function finishedTodos() {
+    const completedItems: Todo[] = [];
     const newTodos = todos.filter((todo) => {
       if (selectedTodos.has(todo.id)) {
+        completedItems.push({ ...todo, completedAt: new Date().toISOString() });
         return false;
       }
       return true;
     });
+    setCompletedTodos([...completedItems, ...completedTodos]);
     setTodos(newTodos);
     setSelectedTodos(new Set());
+  }
+
+  function deleteCompletedTodo(id: number) {
+    const newCompletedTodos = completedTodos.filter((todo) => todo.id !== id);
+    setCompletedTodos(newCompletedTodos);
   }
 
   return (
@@ -169,6 +180,36 @@ function App() {
             </div>
           )}
         </div>
+
+        {/* Section des tâches terminées */}
+        {completedTodos.length > 0 && (
+          <div className="mt-6 border-t border-primary/20 pt-4">
+            <h2 className="text-xl font-bold text-success mb-3">
+              Tâches terminées ({completedTodos.length})
+            </h2>
+            <ul className='divide-y divide-success/20'>
+              {completedTodos.map((todo) => (
+                <li key={todo.id} className="p-3 opacity-60">
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <span className="line-through text-md font-bold">
+                        {todo.text}
+                      </span>
+                      <span className={`badge badge-sm badge-soft ${todo.priority === 'Urgente' ? 'badge-error' : todo.priority === 'Moyenne' ? 'badge-warning' : 'badge-success'}`}>
+                        {todo.priority}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => deleteCompletedTodo(todo.id)}
+                      className="btn btn-sm btn-error btn-soft">
+                      <Trash className="w-4 h-4" />
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
 
     </div>
