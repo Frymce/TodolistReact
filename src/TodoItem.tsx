@@ -1,4 +1,5 @@
-import { Edit, Trash } from "lucide-react";
+import { Edit, Trash, Check, X } from "lucide-react";
+import { useState } from "react";
 
 type Priority = 'Urgente' | 'Moyenne' | 'Basse';
 
@@ -16,6 +17,29 @@ type TodoItemProps = {
     onEdit: (id: number, newText: string) => void;
 };
 const TodoItem = ({ todo, onDelete, isSelected, onToggleSelect, onEdit }: TodoItemProps) => {
+    const [isEditing, setIsEditing] = useState(false);
+    const [editText, setEditText] = useState(todo.text);
+
+    const handleSave = () => {
+        if (editText.trim()) {
+            onEdit(todo.id, editText.trim());
+        }
+        setIsEditing(false);
+    };
+
+    const handleCancel = () => {
+        setEditText(todo.text);
+        setIsEditing(false);
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            handleSave();
+        } else if (e.key === 'Escape') {
+            handleCancel();
+        }
+    };
+
     return (
         <li className="p-3">
             <div className="flex justify-between items-center">
@@ -25,21 +49,47 @@ const TodoItem = ({ todo, onDelete, isSelected, onToggleSelect, onEdit }: TodoIt
                         checked={isSelected}
                         onChange={() => onToggleSelect(todo.id)}
                     />
-                    <span className="text-md font-bold">
-                        <span>
-                            {todo.text}
+                    {isEditing ? (
+                        <input
+                            type="text"
+                            value={editText}
+                            onChange={(e) => setEditText(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            className="input input-bordered input-sm w-full max-w-xs"
+                            autoFocus
+                        />
+                    ) : (
+                        <span className="text-md font-bold">
+                            <span>
+                                {todo.text}
+                            </span>
                         </span>
-                    </span>
+                    )}
                     <span className={`badge badge-sm badge-soft ${todo.priority === 'Urgente' ? 'badge-error' : todo.priority === 'Moyenne' ? 'badge-warning' : 'badge-success'}`}>
                         {todo.priority}
                     </span>
                 </div>
                 <div className="flex items-center gap-2">
-                    <button
-                        onClick={() => onEdit(todo.id, prompt("Modifier la tâche", todo.text) || todo.text)}
-                        className="btn btn-sm btn-primary btn-soft">
-                        <Edit className="w-4 h-4" />
-                    </button>
+                    {isEditing ? (
+                        <>
+                            <button
+                                onClick={handleSave}
+                                className="btn btn-sm btn-success btn-soft">
+                                <Check className="w-4 h-4" />
+                            </button>
+                            <button
+                                onClick={handleCancel}
+                                className="btn btn-sm btn-ghost btn-soft">
+                                <X className="w-4 h-4" />
+                            </button>
+                        </>
+                    ) : (
+                        <button
+                            onClick={() => setIsEditing(true)}
+                            className="btn btn-sm btn-primary btn-soft">
+                            <Edit className="w-4 h-4" />
+                        </button>
+                    )}
                     <button
                         onClick={onDelete}
                         className="btn btn-sm btn-error btn-soft">
